@@ -338,8 +338,8 @@ int kfio_sgl_dma_map(kfio_sg_list_t *sgl, kfio_dma_map_t *dmap, int dir)
         sl = &lsg->sl[i];
     }
 
-    i = pci_map_sg(lsg->pci_dev, lsg->sl, lsg->num_entries,
-                    dir == IODRIVE_DMA_DIR_READ ? PCI_DMA_FROMDEVICE : PCI_DMA_TODEVICE);
+    i = dma_map_sg(&lsg->pci_dev->dev, lsg->sl, lsg->num_entries,
+                    dir == IODRIVE_DMA_DIR_READ ? DMA_FROM_DEVICE : DMA_TO_DEVICE);
     lsg->num_mapped = i;
     if (i < lsg->num_entries)
     {
@@ -385,8 +385,8 @@ int kfio_sgl_dma_unmap(kfio_sg_list_t *sgl)
     }
     if (lsg->num_mapped)
     {
-        pci_unmap_sg(lsg->pci_dev, lsg->sl, lsg->num_entries,
-                 lsg->pci_dir == IODRIVE_DMA_DIR_READ ? PCI_DMA_FROMDEVICE : PCI_DMA_TODEVICE);
+        dma_unmap_sg(&lsg->pci_dev->dev, lsg->sl, lsg->num_entries,
+                 lsg->pci_dir == IODRIVE_DMA_DIR_READ ? DMA_FROM_DEVICE : DMA_TO_DEVICE);
     }
     lsg->num_mapped = 0;
     lsg->pci_dir = 0;

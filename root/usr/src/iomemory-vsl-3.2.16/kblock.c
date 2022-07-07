@@ -40,7 +40,7 @@
 #include <fio/port/common-linux/kblock.h>
 #include <fio/port/atomic_list.h>
 #include <linux/blk_types.h>
-#include <linux/genhd.h>
+#include <linux/blkdev.h>
 #include <linux/bio.h>
 #include <linux/blk-mq.h>
 #include <linux/version.h>
@@ -367,7 +367,6 @@ int kfio_expose_disk(kfio_disk_t *dp, char *name, int major, int disk_index,
     gd->fops = &fio_bdev_ops;
     gd->queue = dp->rq;
     gd->private_data = dp->dev;
-    gd->flags = GENHD_FL_EXT_DEVT;
 
     fio_bdev_ops.owner = THIS_MODULE;
 
