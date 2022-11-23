@@ -333,7 +333,6 @@ int kfio_create_disk(struct fio_device *dev, kfio_pci_dev_t *pdev, uint32_t sect
 
     if (enable_discard)
     {
-        blk_queue_flag_set(QUEUE_FLAG_DISCARD, rq);
         // XXXXXXX !!! WARNING - power of two sector sizes only !!! (always true in standard linux)
         blk_queue_max_discard_sectors(rq, (UINT_MAX & ~((unsigned int) sector_size - 1)) >> 9);
         rq->limits.discard_granularity = sector_size;
@@ -424,9 +423,6 @@ void kfio_destroy_disk(kfio_disk_t *disk, destroy_type_t dt)
             fusion_spin_lock_irqsave(disk->queue_lock);
         }
 
-        /* Stop delivery of new io from user. */
-        set_bit(QUEUE_FLAG_DEAD, &disk->rq->queue_flags);
-
         /*
          * Prevent request_fn callback from interfering with
          * the queue shutdown.
@@ -466,7 +462,6 @@ void kfio_destroy_disk(kfio_disk_t *disk, destroy_type_t dt)
 
     if (disk->rq != NULL)
     {
-        blk_cleanup_queue(disk->rq);
         disk->rq = NULL;
     }
 
@@ -1110,7 +1105,7 @@ KFIO_SUBMIT_BIO
     }
 
     if (bio_segments(bio) >= queue_max_segments(queue))
-        BLK_QUEUE_SPLIT;
+        bio = BLK_QUEUE_SPLIT;
 
     // iomemory-vsl4 has atom bio here
 

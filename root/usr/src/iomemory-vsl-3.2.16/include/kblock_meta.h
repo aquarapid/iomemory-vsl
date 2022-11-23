@@ -31,7 +31,6 @@
   static unsigned int kfio_make_request(struct request_queue *queue, struct bio *bio);
   #define KFIO_SUBMIT_BIO_RC return FIO_MFN_RET;
 
-  #define BLK_QUEUE_SPLIT blk_queue_split(queue, &bio);
   #if KFIOC_X_BLK_ALLOC_QUEUE_NODE_EXISTS
     #define BLK_ALLOC_QUEUE blk_alloc_queue_node(GFP_NOIO, node);
   #elif KFIOC_X_BLK_ALLOC_QUEUE_EXISTS
@@ -50,7 +49,7 @@
   #endif
   KFIO_SUBMIT_BIO;
 
-  #define BLK_QUEUE_SPLIT blk_queue_split(&bio);
+  #define BLK_QUEUE_SPLIT bio_split_to_limits(bio);
 #endif /* KFIOC_X_HAS_MAKE_REQUEST_FN */
 #if KFIOC_X_GENHD_PART0_IS_A_POINTER
   #define GD_PART0 gd->part0
